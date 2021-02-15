@@ -32,9 +32,17 @@
     - #### *9.2 - Route Validation with Express*
     - #### *9.3 - Route Validation with Fastify*
 * ### 10 - **Web Security: Mitigating Attacks**
-     - #### *10.1 - Block an Attackers` IP Address with Express*
-     - #### *10.2 - Block an Attackers` IP Address with Fastify*
+     - #### *10.1 - Block an Attackers IP Address with Express*
+     - #### *10.2 - Block an Attackers IP Address with Fastify*
 
 &nbsp;
 
 ## 3 - Creating a Web Server
+Node gives us various options in creating a Web Server, we can use the built in HTTP module (not receommended), Express, Hapi, Koa or Fastify to name a few.
+
+For brevity will focus on Express and Fastify.
+
+Express is the most widely used, however it does posses some limitations, whilst Fastify is the new kid on the block and benefits being able to handle promises and its faster.
+
+#### *3.1 - Creating a Web Server with Express*
+#### *3.2 - Creating a Web Server with Fastify*
