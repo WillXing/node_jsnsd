@@ -46,3 +46,101 @@ Express is the most widely used, however it does posses some limitations, whilst
 
 #### *3.1 - Creating a Web Server with Express*
 #### *3.2 - Creating a Web Server with Fastify*
+
+
+## Express 101
+
+Express is a fast, unopinionated, minimalist web framework, for Node.JS. It helps us build web applications.
+
+The current version is v4.17.1 (it was published over 2 years ago), but its downloaded over 17 million times in the last week.
+Their is a Beta version 5, but this has been in development for over a year.
+
+Express helps us..
+1. - start up a server to listen for requests
+2. - parse incoming requests
+3. - match those requests to particular routes
+4. - craft our http response and associated content
+
+aside:- we need to parse incoming requests, as they are just text strings.
+
+### A Basic setup
+$exp101 // create a folder (not capital name)
+$cd exp101 // go into it
+$npm init -y // set up the package.json file
+$npm i express // install the latest express package
+$touch index.js
+
+'''js
+// index.js
+
+const express = require("express");
+const app = express();
+
+'''
+
+Express returns a function which we invoke, thus returns an object which we assign to const app.
+The app Object has a lot of methods on it which we can use.
+note: to view the object just do $console.dir(app)
+
+
+
+### Getting our web server to start listening
+
+To start our web server, we use the listen method, into which as the first argument we pass the port to listen on for incoming requests, we can pass a second argument, which is a callback that just tells us in the terminal that we are listening.
+
+It's good practice to set up a variable called PORT which is either an environment variable or by default a local port we specify.
+
+'''js
+// index.js
+const PORT = process.env.PORT || 3000
+
+
+app.listen(PORT, () => console.log(`listening on port ${PORT} ....`))
+
+'''
+
+
+
+A HTTP object is not a javascript object it is text, it is not particular to any programming language, but Express takes the HTTP Object and turns it into a Javascript object which is known as the request object, Express also creates a Javascript returning objects known as response object.
+
+The request and response objects have a number of methods & properties on each of them, which we can use.
+
+res.send("yo hello dude!") --> Express will automatically set the Headers `Content-Type` to text/html
+res.send('\<h6>This is me!!\</h6>) --> Express will automatically set the Headers `Content-Type` to text/html
+res.send({name: 'Bob'})  --> Express will automatically set the Headers `Content-Type` to application/json.
+
+
+
+
+### Routing
+
+Taking incoming requests, namely a path that is being requested and passing that to the relevant function to ultimately give the appropriate response.
+
+We are `routing` some incoming request to some out going response.
+
+### Path parameters (ie variables)
+
+Express add to the req object a property called params, which is an object that contains any path params.
+Note: the property name is taken from the route path and the value is from the URL.
+
+
+
+
+### Query string
+A query string is a portion of the url that comes after a question mark.
+Express has a query property on the request object, by default its blank, but if the url contains a query string the request object is populated with its key/values pairs. 
+
+```
+localhost:3000/search?q=dogs&color=red&car=ford
+```
+
+The key points are:-
+1. `?` denotes the start of a query string.
+2. `&` separates each query key/value pair.
+
+
+The req.query object would look like:-
+
+```js
+{ q: 'dogs', color: 'red', cars: 'ford'}
+```
