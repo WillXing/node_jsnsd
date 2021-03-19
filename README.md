@@ -144,3 +144,40 @@ The req.query object would look like:-
 ```js
 { q: 'dogs', color: 'red', cars: 'ford'}
 ```
+
+
+### Serving up web content
+
+view templating engine, ejs, handlebars etc
+we use res.render
+What happens is, when its time to render the template file, ejs takes the template file and evaluates it, ie in any places its see's javascript it runs the javascript and returns the html.
+
+ejs, where it sees any js renders it and return
+
+we what to make our templates as stupid as possible, ie they should just display things, ie  not used to calculate and present the result, just display the result. Thus we should do any calculation etc outside of the template and only pass the template the result.
+
+conditional EJS
+
+emded js, think of ejs their to control the flow.
+
+using a loop
+
+### Serving static files
+ie serving css, html and Javascript (the js will need to run in the browser)
+
+we need to use express.static
+
+### practice
+
+1. Build a simple web server that:-
+   contains an array of dog names,
+   i) responds with the specified name of a dog
+   ii) responds with an array of dog names
+   for each of the above a html string or json object should be returned.
+
+2. Modify the above to include a resource that mimicks an async call, timeout function will do,
+
+3. Build a web simple web server that:-
+    return web content, ie public files such as css, html and JS to run in the browser
+
+5. RESTful routing
