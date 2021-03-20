@@ -250,6 +250,7 @@ To do
 | 3 | Bring in http error package | $npm http-errors@1 |
 | 4 | Create the routes directory and files | $mkdir |
 
+
 ```
 TERMINAL 
 
@@ -260,6 +261,8 @@ $mkdir routes routes/index.js routes/hello.js
 $
 ```
 
+<table >
+    <tbody ><tr><td><details >
 
 ```js
 // app.js
@@ -296,12 +299,12 @@ app.use((err, req, res, next) => {
 });
 
 
-
-
-
 app.listen(PORT, () => console.log(`listening on port ${PORT}...`));
-
 ```
+
+
+</details></td></tr></tbody>
+</table>
 
 
 ```js
