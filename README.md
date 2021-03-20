@@ -201,22 +201,72 @@ start vai package.json to wwww
 The checklist: basic express set up
 
 
-|  Start Date   | End Date     |
-| ------------- | ------------ |
-| March 8, 2021   | April 6, 2021 |
 
-
-
-| Seq | Description                             | What to do  |
-| --- | --------------------------------------- | ----------- |
-| 1.  | Create the folder                       | $mkdir testFolder |
-| 2.  | Go into folder                          | $cd testFolder |
-| 3.  | Create up package.json file             | $npm init -y |
-| 4.  | Install express & other packages        | $npm install express@4 http-errors@1 |
-| 5.  | Create main file                        | $touch app.js |
-| 6.  | Get server up and running - app.js file | const express = require('express'); |
+| No | Description                             | What to do  |
+| -- | --------------------------------------- | ----------- |
+| 1  | Create the folder                       | $mkdir testFolder |
+| 2  | Go into folder                          | $cd testFolder |
+| 3  | Create up package.json file             | $npm init -y |
+| 4  | Install express & other packages        | $npm install express@4 http-errors@1 |
+| 5  | Create main file                        | $touch app.js |
+| 6  | Get server up  - app.js file | const express = require('express'); |
 |  |                                         | const app = express(); |
 |  |                                         | const PORT = process.env.PORT || 3000; |
 |  |                                         | app.listen(PORT, () => console.log(\`listening on port ${PORT}..`)); |
+|7| app start via "start" package.json  | "start": "node app.js"; |
+|8 | make sure web server spins up | $npm start |
 
 
+Task:-
+
+A. Create a webserver that:-
+1. Returns specific error messages for :-
+   1. method not allowed
+   2. non valid resource requested
+   3. internal server error.
+2. Keep the main file clean resources should be separated away.
+3. users should be able to to request:
+   1. GET/index  --> returns a html page with a tag href to the hello resource
+   2. GET/hello --> returns  a html page with hello world tag
+
+
+Thoughts:-
+Need to use a specific error npm package, ie http-errors
+Set up a routes directory, to contain index.js & hello.js
+
+
+notes: 
+`error 404` is the standard error response to a non valid resource request.
+`error 405` is the standard error response to a method not allowed request.
+`error 500` is the standard error response to a internal server error.
+
+
+To do
+
+| No | Description                             | What to do  |
+| -- | --------------------------------------- | ----------- |
+| 1  | Create the folder                       | $mkdir testFolder |
+| 2  | Go into folder                          | $cd testFolder |
+| 3 | Bring in http error package | $npm http-errors@1 |
+| 4 | Create the routes directory and files | $mkdir |
+
+```
+TERMINAL 
+
+1. $mkdir testFolder
+$cd testFolder
+$npm i http-errors@1  // bring in the http package
+
+$
+```
+
+
+```js
+TERMINAL 
+
+1. $mkdir testFolder
+$cd testFolder
+$npm i http-errors@1  // bring in the http package
+
+$
+```
