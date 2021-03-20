@@ -262,7 +262,10 @@ $
 ```
 
 <table >
-    <tbody ><tr><td><details >
+    <tbody ><tr><td><details>
+    <sub>
+        <b>Click: for full description of app.js</b>
+    </sub>
 
 ```js
 // app.js
@@ -307,6 +310,14 @@ app.listen(PORT, () => console.log(`listening on port ${PORT}...`));
 </table>
 
 
+
+<table >
+    <tbody ><tr><td><details>
+    <sub>
+        <b>Click: for full description of index.js</b>
+    </sub>
+
+
 ```js
 // index.js
 
@@ -334,7 +345,15 @@ router.get('/', (req, res) => {
 module.exports = router;
 
 ```
+</details></td></tr></tbody>
+</table>
 
+
+<table >
+    <tbody ><tr><td><details>
+    <sub>
+        <b>Click: for full description of hello.js</b>
+    </sub>
 
 ```js
 // hello.js
@@ -362,3 +381,5 @@ router.get('/', (req, res) => {
 module.exports = router;
 
 ```
+</details></td></tr></tbody>
+</table>
