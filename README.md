@@ -181,3 +181,34 @@ we need to use express.static
     return web content, ie public files such as css, html and JS to run in the browser
 
 5. RESTful routing
+
+### notes
+3 - create a basic web server
+    - routes directory
+      - index.js
+      - hello.js
+    - bin directory
+      - www file
+        -  require app & http, declare port and listen
+    - app.js (main file)
+      - require express, assign to app, export app
+
+install express (v4) and http-errors@1
+
+start vai package.json to wwww
+
+
+The checklist: basic express set up
+
+| Seq | Description                             | What to do  |
+| 1.  | Create the folder                       | $mkdir testFolder |
+| 2.  | Go into folder                          | $cd testFolder |
+| 3.  | Create up package.json file             | $npm init -y |
+| 4.  | Install express & other packages        | $npm install express@4 http-errors@1 |
+| 5.  | Create main file                        | $touch app.js |
+| 6.  | Get server up and running - app.js file | const express = require('express'); |
+|  |                                         | const app = express(); |
+|  |                                         | const PORT = process.env.PORT || 3000; |
+|  |                                         | app.listen(PORT, () => console.log(\`listening on port ${PORT}..`)); |
+
+
