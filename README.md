@@ -262,10 +262,14 @@ $
 ```
 
 <table >
-    <tbody ><tr><td><details>
+    <tbody ><tr><td><details><summary>
     <sub>
         <b>Click: for full description of app.js</b>
     </sub>
+    <h6> Given blah blah</h6>
+    -  this is a test
+    -  of what it can do
+    </summary><hr>
 
 ```js
 // app.js
