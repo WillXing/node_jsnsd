@@ -253,20 +253,109 @@ To do
 ```
 TERMINAL 
 
-1. $mkdir testFolder
+$mkdir testFolder
 $cd testFolder
 $npm i http-errors@1  // bring in the http package
-
+$mkdir routes routes/index.js routes/hello.js
 $
 ```
 
 
 ```js
-TERMINAL 
+// app.js
 
-1. $mkdir testFolder
-$cd testFolder
-$npm i http-errors@1  // bring in the http package
+'use strict'
+const express = require('express');
+const createError = require('http-errors');
+const indexRoutes = require('./routes');
+const helloRoutes = require('./routes/hello');
 
-$
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.use('/', indexRoutes);
+app.use('/hello', helloRoutes);
+
+
+app.use((req, res, next) => {
+  if(req.method !== 'GET') {
+    next(createError(405));
+    return;
+  }
+  next(createError(404));
+});
+
+console.log('im here now');
+
+app.use((err, req, res, next) => {
+  console.log("this is err: ",err);
+  console.dir(err);
+  res.status(err.status || 500);
+  res.send(err.message);
+});
+
+
+
+
+
+app.listen(PORT, () => console.log(`listening on port ${PORT}...`));
+
+```
+
+
+```js
+// index.js
+
+'use strict'
+const { Router } = require('express');
+const router = Router();
+
+const root = `<html>
+<head>
+  <style>
+    body { background: #333; margin: 1.25rem }
+    a { color: yellow; font-size: 2rem; font-family: sans-serif }
+  </style>
+</head>
+<body>
+  <a href='/hello'>Hello</a>
+</body>
+</html>
+`
+
+router.get('/', (req, res) => {
+  res.send(root);
+});
+
+module.exports = router;
+
+```
+
+
+```js
+// hello.js
+
+'use strict'
+const { Router } = require('express');
+const router = Router();
+
+const hello = `<html>
+  <head>
+    <style>
+      body { background: #333; margin: 1.25rem }
+      h1 { color: #EEE; font-family; sans-serif }
+    </style>
+  </head>
+    <body>
+      <h1>Hello World</h1>
+    </body>
+</html>`
+
+router.get('/', (req, res) => {
+  res.send(hello);
+});
+
+module.exports = router;
+
 ```
