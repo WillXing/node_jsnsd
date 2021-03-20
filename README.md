@@ -200,7 +200,15 @@ start vai package.json to wwww
 
 The checklist: basic express set up
 
+
+|  Start Date   | End Date     |
+| ------------- | ------------ |
+| March 8, 2021   | April 6, 2021 |
+
+
+
 | Seq | Description                             | What to do  |
+| --- | --------------------------------------- | ----------- |
 | 1.  | Create the folder                       | $mkdir testFolder |
 | 2.  | Go into folder                          | $cd testFolder |
 | 3.  | Create up package.json file             | $npm init -y |
