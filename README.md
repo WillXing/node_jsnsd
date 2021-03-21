@@ -1,23 +1,11 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
-   - #### *3.1 - With Express*
-   - #### *3.2 - with Fastify*
 * ### 4 -  **Serving Web Content**
-    - #### *4.1 - Express*
-    - ##### *4.1.1 - Serving Static Content*
-    - ##### *4.1.2 - Using Templates*
+    - ##### *4.1.2 - Using Templates for static content*
     - ##### *4.1.3 - Streaming Content*
-    - #### *4.2 - Fastify*
-    - ##### *4.2.1 - Serving Static Content*
-    - ##### *4.2.2 - Using Templates*
-    - ##### *4.2.3 - Streaming Content*
 * ### 5 -  **Creating RESTful JSON Services**
-    - #### *5.1 - Coventions*
-    - #### *5.2 - Implementing a RESTful JSON GET with Express*
-    - #### *5.3 - Implementing a RESTful JSON GET with Fastify*
 * ### 6 -  **Manipulating Data with RESTful Services**
-   - #### *6.1 - Implementing POST,PUT and DELETE with Express*
-   - #### *6.2 - Implementing POST,PUT and DELETE with Fastify*
+   - #### *6.1 - Implementing POST,PUT and DELETE **
 * ### 7 -  **Consuming and Aggregating Services**
     - #### *7.1 - Convention and Service Discovery*
     - #### *7.2 - Mock Services*
@@ -30,10 +18,10 @@
 * ### 9 -  **Web Security: Handling User Input**
     - #### *9.1 - Avoiding Parameter Pollution Attacks*
     - #### *9.2 - Route Validation with Express*
-    - #### *9.3 - Route Validation with Fastify*
 * ### 10 - **Web Security: Mitigating Attacks**
-     - #### *10.1 - Block an Attackers IP Address with Express*
      - #### *10.2 - Block an Attackers IP Address with Fastify*
+
+### res.render() function compiles the template (ie html & any evaluated expressions), and returns the rendered html string to the client.
 
 &nbsp;
 
@@ -45,8 +33,6 @@ For brevity will focus on Express and Fastify.
 Express is the most widely used, however it does posses some limitations, whilst Fastify is the new kid on the block and benefits being able to handle promises and its faster.
 
 #### *3.1 - Creating a Web Server with Express*
-#### *3.2 - Creating a Web Server with Fastify*
-
 
 ## Express 101
 
@@ -217,7 +203,10 @@ The checklist: basic express set up
 |8 | make sure web server spins up | $npm start |
 
 
-Task:-
+                -----------------------------------------------------------------------------
+
+
+### 3.0 Task:-
 
 A. Create a webserver that:-
 1. Returns specific error messages for :-
@@ -296,11 +285,8 @@ app.use((req, res, next) => {
   next(createError(404));
 });
 
-console.log('im here now');
-
 app.use((err, req, res, next) => {
-  console.log("this is err: ",err);
-  console.dir(err);
+    console.log('error status: ', err.status);
   res.status(err.status || 500);
   res.send(err.message);
 });
@@ -308,6 +294,10 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => console.log(`listening on port ${PORT}...`));
 ```
+
+In the above for our web server we accept two routes `'/'` and `'/hello'` both of which must be `GET` methods.
+If a non `GET` method is sent then it is picked up and a `405` error is created, else any other non valid request is given a `404` error. In both cases the error middleware picks up the error and responds to the client with it.
+In the above example we have no way of ever replying with a `500` error, it is however good practice to include a default option.
 
 
 </details></td></tr></tbody>
@@ -387,3 +377,280 @@ module.exports = router;
 ```
 </details></td></tr></tbody>
 </table>
+
+
+                -----------------------------------------------------------------------------
+
+### 3.1 Task:- Deliver Data from a Library API
+
+A. Create a webserver that:-
+
+1. listens on localhost
+2. listens on port 3000.
+3. Responds to HTTP GET requests to / with data from the data function as exported from the data.js file.
+4. Responds with a 404 to GET to any other route.
+5. Responds with a 405 to any non GET method, else responds to anything else with a 500.
+6. The package.json start script must contain a command to start the server. 
+
+
+Note: data.js file exports a function that returns a promise (ie async function), also no other resources thus no need to use routes.
+
+the todo:-
+
+1. - create folder & go into it
+2. - create the app.js & data.js files
+3. - copy across data.js below
+4. - create package.json (make sure in main folder)
+5. - bring in express @4 & http-errors@1
+6. - set "start" in package.json
+7. - set up app.js file and spin up server
+8. - set up the catch all error middleware
+9. - set up the route handler and correctly handle the async ie `res.send(await data());`
+
+
+
+
+
+
+```js
+// data.js 
+
+'use strict'
+const { promisify } = require('util');
+const { randomBytes } = require('crypto');
+const timeout = promisify(setTimeout);
+
+async function data() {
+    await timeout(50);
+    return randomBytes(10).toString('base64');
+}
+
+module.exports = data;
+```
+
+Thoughts:-
+The data.js file exports a function that returns a promise (ie async function), so will have to correctly handle any errors that may give.
+
+
+```js
+// app.js
+
+const express = require('express');
+const createError = require('http-errors');
+
+const data = require('./data');
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.get('/', async function(req, res, next) {
+  try {
+    res.send(await data());
+  } catch {
+     next(createError(500))
+  }})
+
+  app.use((req, res, next) => {
+    if(req.method !== 'GET') {
+      next(createError(405));
+      return;
+    }
+    next(createError(404));
+  });
+
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500)
+  res.send(err.message)
+})
+
+
+app.listen(PORT, () => console.log(`Listening on port....${PORT}..`));
+
+```
+
+
+
+
+
+                -----------------------------------------------------------------------------
+
+
+### 3.2 Task:- Implement a Status Code Response
+
+A. Create a webserver that:-
+
+1. listens on localhost
+2. listens on port 3000.
+3. Responds to HTTP GET requests to / with a 200 OK HTTP status (content is irrelevant)
+4. Responds to HTTP POST requests to / with a 405 Method Not Allowed HTTP status
+5. The package.json start script must contain a command to start the server.
+
+
+Thoughts:-
+Seems pretty straight forward.
+
+
+the todo:-
+
+1. - create folder & go into it
+2. - create the app.js file
+3. - create package.json (make sure in main folder)
+4. - bring in express @4 & http-errors@1
+5. - set "start" in package.json
+6. - set up app.js file and spin up server
+7. - set up the catch all error middleware
+
+
+```js
+// app.js
+
+const express = require('express');
+const createError = require('http-errors');
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+
+app.get('/', function(req, res, next) {
+  res.send('<h1>Hello</h1>')
+});
+
+app.use((req, res, next) => {
+  if(req.method !== 'GET') {
+    next(createError(405));
+    return;
+  }
+  next(createError(404));
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.status || 500)
+res.send(err.message)
+})
+
+app.listen(PORT, console.log(`Listening on port ${PORT}.....`));
+```
+
+
+----
+
+### 4 -  **Serving Web Content**
+Generally static assets should not be served by Node, it can be done, but Node is best used for dynamic content.
+That said we can serve static content but in reality you wouldn't really do it.
+
+### Serving Static content
+
+### Streaming data
+
+### Generating dynamic content with templating engine
+
+
+---
+
+### 5 -  **Creating RESTful JSON Services**
+GET
+
+---
+
+### 6 -  **Manipulating Data with RESTful Services**
+POST,PUT, DELETE
+---
+
+
+
+
+
+                -----------------------------------------------------------------------------
+
+
+### 0 - Handling errors
+This is pivotable in Express so have include first.
+
+If somethings goes wrong, Express will respond with an error, usually the `500 Internal Server Error` with the corresponding stack trace and it will crash our app (note: in production no stack trace will be given out).
+
+We can define our own error handling middleware, which function in the same way as other middleware functions, except error-handling functions have four arguments instead of three: (err, req, res, next).
+
+As in any middleware if we don't call next() then no more middleware is called. 
+
+If we have a catch all middleware error function it should go at the end of the chain of middleware functions.
+
+`next()` will pass us onto the next middleware function
+`next(err)` will pass us onto the next error handling middleware, if we haven't built one then it will be the inbuilt Express error handler (which as we have seen returns the stack trace). Note if we have generated an error then it is our error that will be passed on.
+
+
+```js
+// below is an extract
+// createError is from the npm package http-errors
+// it allows us to create an error.
+
+app.use((req, res, next) => {
+    if(req.method !== 'GET') {
+        next(createError(405))
+    return
+  }
+  next(createError(404))
+})
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500)
+  res.send(err.message)
+})
+```
+
+Our First middleware function just checks to see if the request method is a `GET` if it isn't then it creates an error with a 405 error status code. We invoke `next()` with the actual error generated, so we are now going to invoke the next error middleware.
+
+Note:- we `return` out of the `if block` and the function, if we didn't then `next(createError(404))` would run.
+
+The error middleware (which we know is error middleware as it has 4 parameters the first one being err) in this case receives the error we generated and responds out to the user the status code of 405 and the error message generated.
+
+This error middleware is a catch all for errors, ie if an error occurred and we don't generate an error status etc, then here we will see no error status has been generated and we will give it a error status of 500 and send it on its way.
+
+Its very important we do this, without it the app would crash!!.
+
+
+#### Async Errors
+
+handling errors with async functions, the current version of Express v4, doesn't handle `Promises` the next version Express version 5 will, however that is still to be released.
+
+The recommended way per the docs is to use a if block.
+
+```js
+app.get('/' function(req, res, next) {
+    fs.readFile('file-does-not-exist', function(err, data) {
+        if(err) {
+            next(err) // Pass errors to Express
+        } else {
+            res.send(data)
+        }
+    })
+})
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500)
+  res.send(err.message)
+})
+```
+
+
+An alternative, a maybe better as its a catch all, is to use a try/catch block.
+
+```js
+app.get('/' async function(req, res, next) {
+    try {
+        await fs.readFile('file-does-not-exist', function(err, data) {
+            res.send(data);
+        } catch (err) {
+            next(err);
+        }
+})
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500)
+  res.send(err.message)
+})
+```
+
+So we are in effect catching the error and passing it onto a the specific error catcher middleware.
+
