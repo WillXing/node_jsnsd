@@ -540,14 +540,192 @@ app.listen(PORT, console.log(`Listening on port ${PORT}.....`));
 Generally static assets should not be served by Node, it can be done, but Node is best used for dynamic content.
 That said we can serve static content but in reality you wouldn't really do it.
 
-### Serving Static content
+Fastify the alternative to Express is more around serving RESTful JSON services, whereas Express is geared more towards template rendering (and serving static content), thus Express has these features built into its core.
+
+#### serving static content using template engine
+
+Create a web server that will use any templating engine of choice to render 
+
+
+
+1. - create folder & go into it
+2. - create the app.js file
+3. - create package.json (make sure in main folder)
+4. - bring in express @4 & http-errors@1
+5. - set "start" in package.json
+6. - set up app.js file and spin up server
+7. - set up the catch all error middleware
+
+8. - create a routes folder with index & hello files
+9. - install a templating engine of choice (ejs)
+10. - set up a view folder with index.ejs & hello.ejs files (populate as below)
+11. - tell express we are using ejs and join to the views folder
+12. - set up the routes files as per below
+13. - set the paths for `'/'` and `'/hello'` in app.js file (ie to routes)
+14. - `require` in the routes files into app
+15. - create a `public` folder and within it a `layout.css` file & populate with html styles
+16. - link to styles file in ejs files
+17. - tell express about the public folder and set an absolute path to it
+
+
+Aside ejs
+`<%= evaluates js and returns a result %>`
+`<% just says ignore I'm doing some JS stuff>`
+
+example:-
+<h1>Your random number is : <%= num %></h1>
+<% if(num % 2 === 0) { %>
+<h2>That is an even number!</h2>
+<% } else { %>
+<h2>That is an odd number!</h2>
+<% } %>
+<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>
+
+
 
 ### Streaming data
 
-### Generating dynamic content with templating engine
+1. Install hn-latest-stream package (its a package for getting hacker news)
+2. In the routes directory create a new route called articles.js
+3. Bring in the new file (articles.js) to app.js
+4. Register the articles route (ie `app.use('/articles', articlesRoute);` )
+5. Populate articles.js file as below.
+
+```js
+
+// articles.js
+'use strict'
+const express = require('express');
+const router = express.Router();
+const hnLatestStream = require('hn-latest-stream');
+const finished = require('stream').finished;
+
+
+router.get('/', function(req, res, next) {
+  const { amount = 10, type = 'html'} = req.query;
+
+  if (type === 'html') res.type('text/html');
+  if (type === 'json') res.type('application/json');
+
+  const stream = hnLatestStream(amount, type)
+
+  stream.pipe(res, { end: false});
+  
+  finished(stream, (err) => {
+    if(err) {
+      next(err)
+      return
+    }
+    res.end()
+  })
+});
+
+module.exports = router;
+
+```
+
+
+
+```js
+// app.js
+
+'use strict'
+const express = require('express');
+const createError = require('http-errors');
+const path = require('path');
+
+const indexRoutes = require('./routes');
+const helloRoutes = require('./routes/hello');
+const articlesRoutes = require('./routes/articles');
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRoutes);
+app.use('/hello', helloRoutes);
+app.use('/articles', articlesRoutes);
+
+
+app.use((req, res, next) => {
+  if(req.method !== 'GET') {
+    next(createError(405));
+    return;
+  }
+  next(createError(404));
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.status || 500)
+res.send(err.message)
+})
+
+
+app.listen(PORT, () => console.log(`stream listening on port ${PORT}...`));
+
+```
+
+
+
+                -----------------------------------------------------------------------------
+
+
+
+### 4.1 Task:- Render a view
+
+
+
+
+
+
+                -----------------------------------------------------------------------------
+
+
+
+### 4.2 Challenge:- Steam some content
+
+Into the stream app done above in 4.0 Streaming data, add a file called stream.js which contains:-
+
+```js
+// stream.js
+
+'use strict'
+
+const { Readable, Transform } = require('stream')
+
+function stream () {
+  const readable = Readable.from([
+    'this', 'is', 'a', 'stream', 'of', 'data'
+  ].map((s) => s + '<br>'))
+  const delay = new Transform(({
+    transform (chunk, enc, cb) {
+      setTimeout(cb, 500, null, chunk)
+    }
+  }))
+  return readable.pipe(delay)
+}
+
+module.exports = stream
+```
+
+Create a new route path `/data` and send data from this stream function as a response when the `/data` route is requested.
+
+1. - In routes directory create data.js file
+2. - Set up data.js and require in the data.js file 
+3. - In app.js bring in data route.
 
 
 ---
+
+
+
+
+
 
 ### 5 -  **Creating RESTful JSON Services**
 GET
