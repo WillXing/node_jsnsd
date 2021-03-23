@@ -1,9 +1,16 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
+    - ##### *3.0 - creating one
+    - ##### *3.1 - returns data from a library API
+    - ##### *3.2 - implements a status code response
 * ### 4 -  **Serving Web Content**
-    - ##### *4.1.2 - Using Templates for static content*
-    - ##### *4.1.3 - Streaming Content*
+    - ##### *4.0.1 - uses templates
+    - ##### *4.0.2 - servers static content using templates
+    - ##### *4.1 - render a view
+    - ##### *4.2 - stream content
 * ### 5 -  **Creating RESTful JSON Services**
+    - ##### *5.0 - creating one
+    - ##### *5.1 - implementing a RESTful JSON GET
 * ### 6 -  **Manipulating Data with RESTful Services**
    - #### *6.1 - Implementing POST,PUT and DELETE **
 * ### 7 -  **Consuming and Aggregating Services**
@@ -383,7 +390,7 @@ module.exports = router;
 
 ### 3.1 Task:- Deliver Data from a Library API
 
-A. Create a webserver that:-
+**A. Create a webserver that:-**
 
 1. listens on localhost
 2. listens on port 3000.
@@ -393,9 +400,9 @@ A. Create a webserver that:-
 6. The package.json start script must contain a command to start the server. 
 
 
-Note: data.js file exports a function that returns a promise (ie async function), also no other resources thus no need to use routes.
+***Note: data.js file exports a function that returns a promise (ie async function), also no other resources thus no need to use routes.***
 
-the todo:-
+#### To do:-
 
 1. - create folder & go into it
 2. - create the app.js & data.js files
@@ -730,11 +737,227 @@ Create a new route path `/data` and send data from this stream function as a res
 ### 5 -  **Creating RESTful JSON Services**
 GET
 
+
+### 5.1 Task:- Implement a RESTful JSON GET
+
+A. Create a webserver that:-
+
+1. We have two files, model.js & package.json (detailed below)
+2. Use Express to implement a RESTful HTTP server so that when the command **npm start** is executed it starts a server that listens on **process.env.PORT**.
+3. The server should support a **GET** request to a single route: **/boat/{id}** where **{id}** is a placeholder for any given ID - for instance **/boat/2**.
+4. The **GET /boat/{id}** route should respond with a JSON payload. The route should also respond with the correct headers for a JSON response **(Content-Type: application/json)**.
+   
+   The server should support this GET route. That means that any other routes or any other verbs should be handled according to the HTTP specification. Thankfully Express will do most of this for us.
+
+   The following cases must be successfully handled:
+   * - A successful request should respond with a 200 status code, Express will do this automatically. 
+   * - The response should have the correct mime type header. In this case we need to make sure the **Content-Type** header is set to **application/json**.
+   * - A GET request to a route that does not exist should respond with a **404** status code. The Express configuration handles this by default.
+   * - If a given boat ID isn't found in the model the server should respond with a **404** status code. The response body can contain anything, but it's important that the response status is set to 404.
+   * - Unexpected errors in the model should cause the server to respond with a **500** status code. This means that if the **read** method of the model passed an Error object to the callback that was unexpected or unrecognised, that error needs to be propagated to the framework we're using in some way so that the framework can automatically generate a 500 response.
+   * - In HTTP specification there is some ambiguity over how to handle unsupported HTTP methods. Any HTTP method other than a **GET** should respond with either a **400, 404** or **405** status code. Again Express will respond to unsupported methods with one of these status codes.
+
+Do not edit the **model.js** file, it will be overwritten by the validation process any way. The **model.js** file is deliberately noisy, providing methods that we don't need for this exercise. This reflects real world scenarios.
+
+
+files:-
+
+```json
+// package.json
+{
+  "name": "labs-1",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "echo \"Error: start script not specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+```
+
+```js
+'use strict'
+
+  module.exports = {
+    boat: boatModel()
+  }
+  
+  function boatModel () {
+    const db = {
+      1: { brand: 'Chaparral', color: 'red' },
+      2: { brand: 'Chaparral', color: 'blue' }
+    }
+  
+    return {
+      uid,
+      create,
+      read,
+      update,
+      del
+    }
+  
+    function uid () {
+      return Object.keys(db)
+        .sort((a, b) => a - b)
+        .map(Number)
+        .filter((n) => !isNaN(n))
+        .pop() + 1 + ''
+    }
+  
+    function create (id, data, cb) {
+      if (db.hasOwnProperty(id)) {
+        const err = Error('resource exists')
+        err.code = 'E_RESOURCE_EXISTS'
+        setImmediate(() => cb(err))
+        return
+      }
+      db[id] = data
+      setImmediate(() => cb(null, id))
+    }
+  
+    function read (id, cb) {
+      if (id === 'c060') {
+        setImmediate(() => cb(Error('unknown')))
+      }
+      if (!(db.hasOwnProperty(id))) {
+        const err = Error('not found')
+        err.code = 'E_NOT_FOUND'
+        setImmediate(() => cb(err))
+        return
+      }
+      setImmediate(() => cb(null, db[id]))
+    }
+  
+    function update (id, data, cb) {
+      if (!(db.hasOwnProperty(id))) {
+        const err = Error('not found')
+        err.code = 'E_NOT_FOUND'
+        setImmediate(() => cb(err))
+        return
+      }
+      db[id] = data
+      setImmediate(() => cb())
+    }
+  
+    function del (id, cb) {
+      if (!(db.hasOwnProperty(id))) {
+        const err = Error('not found')
+        err.code = 'E_NOT_FOUND'
+        setImmediate(() => cb(err))
+        return
+      }
+      delete db[id]
+      setImmediate(() => cb())
+    }
+  }
+```
+
+
+Thoughts:-
+Make sure the **express-generator** package is globally installed, **(npm install -g express-generator)**.
+create a project, ie **express my-express-service**
+
+1. $express 5.1attemptlab
+2. cd into it
+3. $npm install (install dependencies)
+4. put in and populate model.js file
+5. need to set up the boat route
+      1. in the app.js rename default /users to boat.
+      2. rename routes/users.js to routes/boat.js.
+      3. rename all reference to users in app.js file to boat.
+6. In the routes/boat.js need to do the following
+      1. require in the model.js file
+      2. change the route handler to handle id params
+      3. add in logic to retrieve data from models
+      4. add in error handling
+
+key learning:
+a - use express project generator
+b - rename files with mv
+
 ---
 
 ### 6 -  **Manipulating Data with RESTful Services**
-POST,PUT, DELETE
+Previously we handled GET requests, now need to handle POST,PUT & DELETE ones.
+
+
+
+1. $express 6.0CRUD
+2. cd into it
+3. $npm install (install dependencies)
+4. put in and populate model.js file (as per below)
+5. need to set up the bicycle route
+      1. in the app.js rename default /users to bicycle.
+      2. rename routes/users.js to routes/bicycle.js.
+      3. rename all reference to users in app.js file to bicycle.
+6. In the routes/bicycle.js need to do the following
+      1. require in the model.js file
+      2. 
+      3. change the route handler to handle id params
+      4. add in logic to retrieve data from models
+      5. add in error handling
+
+```js
+// model.js
+
+```
+
+
 ---
+
+
+### 6.1 Task:- Implement a RESTful JSON POST
+
+
+
+A. Create a webserver that:-
+
+1. We have two files, model.js & package.json (detailed below)
+2. Use Express to implement a RESTful HTTP server so that when the command **npm start** is executed it starts a server that listens on **process.env.PORT**.
+
+The server should support a **POST** request to **/boat** that uses the **model.js** file to create a new entry. The route should only accept **application/json** mine-type requests and should respond with **application/json** content-type responses.
+
+Th **POST** request should expect JSON data to be sent in the following format:
+
+**{ data: { brand, color } }**
+
+A successful request should respond with a 201 Created status code. Unexpected errors should result in a 500 Server Error response.
+
+The service must also support **GET /boat/ {id}** route.
+
+
+what to do:-
+
+1. $express 6.1ImplementRestful
+2. cd into it
+3. $npm install (install dependencies)
+4. put in and populate model.js file (as per below)
+5. need to set up the boat route
+      1. in the app.js rename default /users to boat.
+      2. rename routes/boat.js to routes/boat.js.
+      3. rename all reference to users in app.js file to boat.
+6. In the routes/boat.js need to do the following
+      1. require in the model.js file
+      2. create the get boat/:id route and link to model
+      3. create the post boat route and link to model
+      4. add in error handling (updated)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
