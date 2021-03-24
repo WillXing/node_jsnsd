@@ -26,7 +26,7 @@
     - #### *9.1 - Avoiding Parameter Pollution Attacks*
     - #### *9.2 - Route Validation with Express*
 * ### 10 - **Web Security: Mitigating Attacks**
-     - #### *10.2 - Block an Attackers IP Address with Fastify*
+     - #### *10.2 - Block an Attackers IP Address with Express**
 
 ### res.render() function compiles the template (ie html & any evaluated expressions), and returns the rendered html string to the client.
 
@@ -948,15 +948,107 @@ what to do:-
 
 
 
+                -----------------------------------------------------------------------------
+
+### 9 -  **Web Security: Handling User Input**
+
+for any public facing service we must consider that a user could be malicious. Therefore it is of paramount importance that any external inputs into our service are sanitized in ways to protect our backend code.
+
+
+#### Avoiding parameter pollution Attacks
+
+Parameter pollution exploits a bug that can occur when handling query string parameters. The main aim of such an attack is to cause a service to either crash or slow down. These being forms of Denial of Service attacks.
+
+To prevent this sort of attack we need to understand how query-string parsing works.
+
+in a URL a query string's occurrence is denoted by a ?, so anything after the question mark is treated a query string key/value pairs.
+
+All mainstream Node.js frameworks (and the core **querystring** module) parse the query string into a object.
+
+Given the URL:`http://example.com?name=fred` the query string --> `name=fred`.
+
+The query string is actually parsed into an object so we end up with: `{ name: "fred" }`
+
+
+#### Query string and the array
+
+The following us a legitimate query string: `?name=fred&name=dave`. --> `{ name: ["fred", "dave"] }`
+
+Express also supports square-bracket denotation syntax in query-strings. 
+So `name[]=dave` --> `{ name: [ "dave"] }`
+
+
+
+Key takeouts:-
+1. Express & Node core querystring module,parse query string into an object
+2. Express (Node querystring module doesn't) supports square-bracket query-string denotation
+3. We need to be aware that the query string can be a string or an array, and as such call appropriate functions.
+
+
+
+
+So backend validation with Express
 
 
 
 
 
 
+                -----------------------------------------------------------------------------
 
 
+### 10 - **Web Security: Mitigating Attacks**
 
+Attacks can take various forms and have different goals. It can be about stealing information, from the server or other uses, other times it can be just to cause disruption. 
+
+The most common sort of disruption based attacks is via a Denial of Service (DOS) attack. This involves automating a large volume of machines each makes a large amount of requests to a single service. Usually this would be handled by the infrastructure around a deployed Node.js service. If we needed to use a Node.js service then we could do the following.
+
+#### Blocking an Attackers IP Address with Express
+
+Express is basically a middleware pattern on top of Node's core **http** (and **https**) modules. The modules use the **net** module for the TCP functionality. 
+
+Each request and response (**req res**) object that is provided to the request listener function has a **socket** property which is the underlying TCP socket for the request and response. 
+
+So **req.socket.remoteAddress** will contain the IP address of the client making a request to an Express service.
+
+Express passes the **req** and **res** objects to each piece of registered middleware in sequence, in order to block an attacking IP, all we need to do is register a middleware function that checks the incoming IP address (**re.socket.remoteAddress**) before passing onto any other middleware.
+
+
+Lets say we wanted to block the IP 127.0.0.1 (this is local host) in a Express application, we would include the following middleware before any other middleware.
+
+```js
+app.use(function (req, res, next) {
+  if (req.socket.remoteAddress === '127.0.0.1') {
+    const err = new Error ('Forbidden');
+    err.status = 403;
+    next(err);
+    return;
+  }
+  next();
+});
+```
+
+So if **req.socket.remoteAddress** matches our target IP address then we generate a new Error and set its error code to 403 (Forbidden) then call **next(err)** which means we pass of our generated error to our catch all error handler and we exit (return out) of this middleware function. if the IP address does not match our target then we just go to the next piece of middleware.
+
+
+### Catch all error handler middleware
+
+When we generate an Express app using the express generator then it automatically includes the error handler below.
+Note:- we know its an error handler as its first parameter is err, also it will be positioned after all the other middleware, so it can catch any errors.
+
+```js
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+```
 
 
 
