@@ -76,6 +76,15 @@ The app Object has a lot of methods on it which we can use.
 note: to view the object just do $console.dir(app)
 
 
+Middleware:-
+
+Included or not include if we run express app creation (do a tick box)
+
+Aside:
+command line http calls
+
+
+
 
 ### Getting our web server to start listening
 
