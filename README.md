@@ -1,16 +1,13 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
-    - ##### *3.0 - creating one
-    - ##### *3.1 - returns data from a library API
-    - ##### *3.2 - implements a status code response
+    - #### return data from a Library API / set status codes
 * ### 4 -  **Serving Web Content**
     - ##### *4.0.1 - uses templates
     - ##### *4.0.2 - servers static content using templates
     - ##### *4.1 - render a view
     - ##### *4.2 - stream content
 * ### 5 -  **Creating RESTful JSON Services**
-    - ##### *5.0 - creating one
-    - ##### *5.1 - implementing a RESTful JSON GET
+    - ##### *5.0 - return JSON for a GET
 * ### 6 -  **Manipulating Data with RESTful Services**
    - #### *6.1 - Implementing POST,PUT and DELETE **
 * ### 7 -  **Consuming and Aggregating Services**
@@ -30,7 +27,12 @@
 
 ### res.render() function compiles the template (ie html & any evaluated expressions), and returns the rendered html string to the client.
 
+
 &nbsp;
+
+Node echo commands:-
+
+
 
 ## 3 - Creating a Web Server
 Node gives us various options in creating a Web Server, we can use the built in HTTP module (not receommended), Express, Hapi, Koa or Fastify to name a few.
