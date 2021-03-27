@@ -1,6 +1,6 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
-    - #### return data from a Library API / set status codes
+    -  #### *return data from a Library API / set status codes
 * ### 4 -  **Serving Web Content**
     - ##### *4.0.1 - uses templates
     - ##### *4.0.2 - servers static content using templates
@@ -37,7 +37,7 @@ GET Methods
 
 `node -e " URL, function... "`
 
-URL -------> "http.get('http.get('http://localhost:3000/1',
+URL -------> "http.get('http.get('http://localhost:3000/1',  
 function --> (res) => console.log(res.statusCode))"
 
 
