@@ -1,8 +1,8 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
-    -  #### return data from a Library API / set status codes
+    -  #### *return data from a Library API / set status codes*
 * ### 4 -  **Serving Web Content**
-      - 4.0.1 - uses templates
+      - ##### *4.0.1 - uses templates*
     - ##### *4.0.2 - servers static content using templates
     - ##### *4.1 - render a view
     - ##### *4.2 - stream content
@@ -30,7 +30,10 @@
 
 &nbsp;
 
-Node echo commands:-
+
+                -----------------------------------------------------------------------------
+
+### A) Node echo commands:-
 
 GET Methods
 `node -e "................"`
@@ -38,15 +41,103 @@ GET Methods
 `node -e " URL, function... "`
 
 URL -------> "http.get('http.get('http://localhost:3000/1',  
-function --> (res) => console.log(res.statusCode))"
+function --> (res) => console.log(res.statusCode))"  
 
-
-----
 
 Non-GET methods
 `node -e "................"`
 
 `node -e " URL, { ...} , function... "`
+
+---
+
+### B) Express TLTR:-
+
+### Path parameters (ie variables in the URL)
+
+Express add to the req object a property called params, which is an object that contains any path params.
+Note: the property name is taken from the route path and the value is from the URL.
+
+```
+localhost:3000/api/tours/5/21
+```
+The Express req.params object would look like:-
+
+
+```js
+{ location: '5', route: '21' }
+```
+
+```js
+app.get('/api/tours/:location/:route', (req, res) => {
+....
+})
+```
+
+The thing to note with params, is that unlike the query string, we tell Express, in the route handler what the key's are the URL is just passing in the values.
+
+The values if numeric are when passed in a string value.
+
+#### Optional params
+we put in a `?` to denote that the parameter is optional, so if we didn't include group (ie 2) then it would still work.
+
+```
+localhost:3000/api/tours/5/21/2
+```
+The Express req.params object would look like:-
+
+
+```js
+{ location: '5', route: '21', group: '2' }
+```
+
+if we didn't include the 2 then the Express req.params object would look like:-
+
+```js
+{ location: '5', route: '21', group: undefined }
+```
+****
+
+```js
+app.get('/api/tours/:location/:route/:group?', (req, res) => {
+....
+})
+```
+
+                -----------------------------------------------------------------------------
+
+### Query string
+A query string is a portion of the url that comes after a question mark.
+Express has a query property on the request object, by default its blank, but if the url contains a query string the request object is populated with its key/values pairs. 
+
+```
+localhost:3000/search?q=dogs&color=red&car=ford
+```
+
+The key points are:-
+1. `?` denotes the start of a query string.
+2. `&` separates each query key/value pair.
+
+
+The Express req.query object would look like:-
+
+```js
+{ q: 'dogs', color: 'red', cars: 'ford'}
+```
+
+---
+
+### C) HTTP TLTR:-
+
+#### Error codes
+`error 404` is the standard error response to a non valid resource request.
+`error 405` is the standard error response to a method not allowed request.
+`error 500` is the standard error response to a internal server error.  
+
+
+
+                -----------------------------------------------------------------------------
+
 
 
 ## 3 - Creating a Web Server
@@ -136,33 +227,6 @@ res.send({name: 'Bob'})  --> Express will automatically set the Headers `Content
 Taking incoming requests, namely a path that is being requested and passing that to the relevant function to ultimately give the appropriate response.
 
 We are `routing` some incoming request to some out going response.
-
-### Path parameters (ie variables)
-
-Express add to the req object a property called params, which is an object that contains any path params.
-Note: the property name is taken from the route path and the value is from the URL.
-
-
-
-
-### Query string
-A query string is a portion of the url that comes after a question mark.
-Express has a query property on the request object, by default its blank, but if the url contains a query string the request object is populated with its key/values pairs. 
-
-```
-localhost:3000/search?q=dogs&color=red&car=ford
-```
-
-The key points are:-
-1. `?` denotes the start of a query string.
-2. `&` separates each query key/value pair.
-
-
-The req.query object would look like:-
-
-```js
-{ q: 'dogs', color: 'red', cars: 'ford'}
-```
 
 
 ### Serving up web content
@@ -257,10 +321,6 @@ Need to use a specific error npm package, ie http-errors
 Set up a routes directory, to contain index.js & hello.js
 
 
-notes: 
-`error 404` is the standard error response to a non valid resource request.
-`error 405` is the standard error response to a method not allowed request.
-`error 500` is the standard error response to a internal server error.
 
 
 To do
