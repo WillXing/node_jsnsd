@@ -1,8 +1,8 @@
 # Node JSNSD notes
 * ### 3 -  **Creating a Web Server**
-    -  #### *return data from a Library API / set status codes
+    -  #### return data from a Library API / set status codes
 * ### 4 -  **Serving Web Content**
-    - ##### *4.0.1 - uses templates
+      - 4.0.1 - uses templates
     - ##### *4.0.2 - servers static content using templates
     - ##### *4.1 - render a view
     - ##### *4.2 - stream content
