@@ -32,6 +32,21 @@
 
 Node echo commands:-
 
+GET Methods
+`node -e "................"`
+
+`node -e " URL, function... "`
+
+URL -------> "http.get('http.get('http://localhost:3000/1',
+function --> (res) => console.log(res.statusCode))"
+
+
+----
+
+Non-GET methods
+`node -e "................"`
+
+`node -e " URL, { ...} , function... "`
 
 
 ## 3 - Creating a Web Server
@@ -45,7 +60,7 @@ Express is the most widely used, however it does posses some limitations, whilst
 
 ## Express 101
 
-Express is a fast, unopinionated, minimalist web framework, for Node.JS. It helps us build web applications.
+Express is a fast, un-opinionated, minimalist web framework, for Node.JS. It helps us build web applications.
 
 The current version is v4.17.1 (it was published over 2 years ago), but its downloaded over 17 million times in the last week.
 Their is a Beta version 5, but this has been in development for over a year.
