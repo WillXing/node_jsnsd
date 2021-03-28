@@ -20,10 +20,11 @@
     - #### *8.1 - Single-Route, Multi-Origin Proxy*
     - #### *8.2 - Single-Origin, Multi-Route Proxy*
 * ### 9 -  **Web Security: Handling User Input**
-    - #### *9.1 - Avoiding Parameter Pollution Attacks*
-    - #### *9.2 - Route Validation with Express*
+    - #### Avoiding Parameter Pollution Attacks*
+    - #### Route Validation with Express*
 * ### 10 - **Web Security: Mitigating Attacks**
-     - #### *10.2 - Block an Attackers IP Address with Express**
+     - #### Block an Attackers IP Address with Express
+     - #### Rate limiting with Express
 
 ### res.render() function compiles the template (ie html & any evaluated expressions), and returns the rendered html string to the client.
 
@@ -52,6 +53,27 @@ Non-GET methods
 ---
 
 ### B) Express TLTR:-
+
+The key express package is the global express-generator which we can use to scaffold out an express server for us.
+
+`$sudo install -g express-generator@4`.
+
+
+If we use the Express generator and it asks us to only allow static hosting in development and production static hosting is left as a deployment infrastructure problem then in app,js file we need to change static to:-
+
+```js
+if (process.env.NODE_ENV !== 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
+```
+
+Also if we are to render a static view then in app.js we need to set the view engine and the directory that will hold the views (note the view files must have the relevant extension ie handlebars --> .hbs, ejs --> .ejs etc)
+
+```js
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+```
+
 
 ### Path parameters (ie variables in the URL)
 
@@ -118,7 +140,6 @@ app.get('/api/tours/:location/:route/:group?', (req, res) => {
 `app.use(express.static(DIRECTORY));` --> required if we are serving static assets
 
 
-
                 -----------------------------------------------------------------------------
 
 ### Query string
@@ -144,9 +165,10 @@ The Express req.query object would look like:-
 
 ### C) HTTP TLTR:-
 
-#### Error codes
-`error 404` is the standard error response to a non valid resource request.
-`error 405` is the standard error response to a method not allowed request.
+#### Error codes  
+
+`error 404` is the standard error response to a non valid resource request.  
+`error 405` is the standard error response to a method not allowed request.  
 `error 500` is the standard error response to a internal server error.  
 
 
@@ -156,7 +178,7 @@ The Express req.query object would look like:-
 
 
 ## 3 - Creating a Web Server
-Node gives us various options in creating a Web Server, we can use the built in HTTP module (not receommended), Express, Hapi, Koa or Fastify to name a few.
+Node gives us various options in creating a Web Server, we can use the built in HTTP module (not recommended), Express, Hapi, Koa or Fastify to name a few.
 
 For brevity will focus on Express and Fastify.
 
@@ -179,33 +201,28 @@ Express helps us..
 
 aside:- we need to parse incoming requests, as they are just text strings.
 
-### A Basic setup
+### A Basic setup (not using the express generator)
+
+```js
 $exp101 // create a folder (not capital name)
 $cd exp101 // go into it
 $npm init -y // set up the package.json file
 $npm i express // install the latest express package
 $touch index.js
+```
 
-'''js
+
+```js
 // index.js
 
 const express = require("express");
 const app = express();
 
-'''
+```
 
 Express returns a function which we invoke, thus returns an object which we assign to const app.
 The app Object has a lot of methods on it which we can use.
-note: to view the object just do $console.dir(app)
-
-
-Middleware:-
-
-Included or not include if we run express app creation (do a tick box)
-
-Aside:
-command line http calls
-
+note: to view the object just do `$console.dir(app)`.
 
 
 
@@ -215,14 +232,14 @@ To start our web server, we use the listen method, into which as the first argum
 
 It's good practice to set up a variable called PORT which is either an environment variable or by default a local port we specify.
 
-'''js
+```js
 // index.js
 const PORT = process.env.PORT || 3000
 
 
 app.listen(PORT, () => console.log(`listening on port ${PORT} ....`))
 
-'''
+```
 
 
 
@@ -230,11 +247,9 @@ A HTTP object is not a javascript object it is text, it is not particular to any
 
 The request and response objects have a number of methods & properties on each of them, which we can use.
 
-res.send("yo hello dude!") --> Express will automatically set the Headers `Content-Type` to text/html
-res.send('\<h6>This is me!!\</h6>) --> Express will automatically set the Headers `Content-Type` to text/html
-res.send({name: 'Bob'})  --> Express will automatically set the Headers `Content-Type` to application/json.
-
-
+- res.send("yo hello dude!") --> Express will automatically set the Headers `Content-Type` to text/html.  
+- res.send('\<h6>This is me!!\</h6>) --> Express will automatically set the Headers `Content-Type` to text/html.  
+- res.send({name: 'Bob'})  --> Express will automatically set the Headers `Content-Type` to application/json.  
 
 
 ### Routing
@@ -253,12 +268,6 @@ What happens is, when its time to render the template file, ejs takes the templa
 ejs, where it sees any js renders it and return
 
 we what to make our templates as stupid as possible, ie they should just display things, ie  not used to calculate and present the result, just display the result. Thus we should do any calculation etc outside of the template and only pass the template the result.
-
-conditional EJS
-
-emded js, think of ejs their to control the flow.
-
-using a loop
 
 ### Serving static files
 ie serving css, html and Javascript (the js will need to run in the browser)
@@ -281,7 +290,7 @@ we need to use express.static
 5. RESTful routing
 
 ### notes
-3 - create a basic web server
+3. - create a basic web server
     - routes directory
       - index.js
       - hello.js
@@ -291,12 +300,12 @@ we need to use express.static
     - app.js (main file)
       - require express, assign to app, export app
 
-install express (v4) and http-errors@1
+`install express (v4) and http-errors@1`
 
-start vai package.json to wwww
+`start via package.json to wwww`
 
 
-The checklist: basic express set up
+#### The checklist: basic express set up
 
 
 
@@ -510,7 +519,7 @@ module.exports = router;
 3. - copy across data.js below
 4. - create package.json (make sure in main folder)
 5. - bring in express @4 & http-errors@1
-6. - set "start" in package.json
+6. - set script "start" in package.json `"start": "node app.js"`
 7. - set up app.js file and spin up server
 8. - set up the catch all error middleware
 9. - set up the route handler and correctly handle the async ie `res.send(await data());`
@@ -522,6 +531,7 @@ module.exports = router;
 
 ```js
 // data.js 
+// result of invoking data will be a random string after a delay
 
 'use strict'
 const { promisify } = require('util');
@@ -542,6 +552,9 @@ The data.js file exports a function that returns a promise (ie async function), 
 
 ```js
 // app.js
+// we use http-errors package to generate an
+// error message based on the status code
+
 
 const express = require('express');
 const createError = require('http-errors');
@@ -577,6 +590,12 @@ app.listen(PORT, () => console.log(`Listening on port....${PORT}..`));
 
 ```
 
+
+Results:-
+
+`GET/ http://localhost:3000` ---> random string of digits (html output) - status of: 200 OK
+`GET/ http://localhost:3000/blarg` --->  Not Found (html output) - status of: 404 Not Found
+`POST/ http://localhost:3000` ---> Method Not Allowed (html output) - status of: 405 Method Not Allowed
 
 
 
@@ -640,6 +659,15 @@ res.send(err.message)
 
 app.listen(PORT, console.log(`Listening on port ${PORT}.....`));
 ```
+
+
+
+
+Results:-
+
+`GET/ http://localhost:3000` ---> <h1>Hello</h1> (html output) - status of: 200 OK
+`GET/ http://localhost:3000/blarg` --->  Not Found (html output) - status of: 404 Not Found
+`POST/ http://localhost:3000` ---> Method Not Allowed (html output) - status of: 405 Method Not Allowed
 
 
 ----
@@ -1094,7 +1122,7 @@ two types of proxies
 
 ### 9 -  **Web Security: Handling User Input**
 
-for any public facing service we must consider that a user could be malicious. Therefore it is of paramount importance that any external inputs into our service are sanitized in ways to protect our backend code.
+For any public facing service we must consider that a user could be malicious. Therefore it is of paramount importance that any external inputs into our service are sanitized in ways to protect our backend code.
 
 
 #### Avoiding parameter pollution Attacks
@@ -1103,20 +1131,21 @@ Parameter pollution exploits a bug that can occur when handling query string par
 
 To prevent this sort of attack we need to understand how query-string parsing works.
 
-in a URL a query string's occurrence is denoted by a ?, so anything after the question mark is treated a query string key/value pairs.
+in a URL a query string's occurrence is denoted by a `?`, so anything after the question mark is treated a query string of key/value pairs.
 
 All mainstream Node.js frameworks (and the core **querystring** module) parse the query string into a object.
 
 Given the URL:`http://example.com?name=fred` the query string --> `name=fred`.
 
-The query string is actually parsed into an object so we end up with: `{ name: "fred" }`
+The query string is actually parsed into an object so we end up with: `{ name: "fred" }`.
 
 
 #### Query string and the array
 
 The following us a legitimate query string: `?name=fred&name=dave`. --> `{ name: ["fred", "dave"] }`
 
-Express also supports square-bracket denotation syntax in query-strings. 
+Express also supports square-bracket denotation syntax in query-strings.  
+
 So `name[]=dave` --> `{ name: [ "dave"] }`
 
 
@@ -1172,6 +1201,7 @@ app.use(
 
 ```
 
+#### Route validation ie checking the body of something !!!!!!
 
 
 
@@ -1180,7 +1210,7 @@ app.use(
 
 ### 10 - **Web Security: Mitigating Attacks**
 
-Attacks can take various forms and have different goals. It can be about stealing information, from the server or other uses, other times it can be just to cause disruption. 
+Attacks can take various forms and have different goals. It can be about stealing information, from the server or other users, other times it can be just to cause disruption. 
 
 The most common sort of disruption based attacks is via a Denial of Service (DOS) attack. This involves automating a large volume of machines each makes a large amount of requests to a single service. Usually this would be handled by the infrastructure around a deployed Node.js service. If we needed to use a Node.js service then we could do the following.
 
@@ -1354,9 +1384,17 @@ app.get('/' async function(req, res, next) {
         }
 })
 
+// this is our global error handling middleware
+// this one will return with a json object
+
 app.use((err, req, res, next) => {
-    res.status(err.status || 500)
-  res.send(err.message)
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message
+  });
 })
 ```
 
