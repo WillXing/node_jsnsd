@@ -33,7 +33,7 @@
 
                 -----------------------------------------------------------------------------
 
-### A) Node echo commands:-
+### A) Node echo terminal commands:-
 
 GET Methods
 `node -e "................"`
@@ -76,7 +76,7 @@ app.get('/api/tours/:location/:route', (req, res) => {
 
 The thing to note with params, is that unlike the query string, we tell Express, in the route handler what the key's are the URL is just passing in the values.
 
-The values if numeric are when passed in a string value.
+Note: numeric values are converted to a string when passed in.
 
 #### Optional params
 we put in a `?` to denote that the parameter is optional, so if we didn't include group (ie 2) then it would still work.
@@ -95,14 +95,29 @@ if we didn't include the 2 then the Express req.params object would look like:-
 
 ```js
 { location: '5', route: '21', group: undefined }
-```
-****
+``` 
 
 ```js
 app.get('/api/tours/:location/:route/:group?', (req, res) => {
 ....
 })
 ```
+
+#### The Key Express modules to include/use:-
+`var helmet = require('helmet');`
+`app.use(helmet());` ---> sets security http headers
+
+`var logger = require('morgan');`
+`app.use(logger('dev'));`   --> needed if we want to log reqs to the command line  
+
+`app.use(express.json());`  
+---> required if using put/patch/post methods, the we need this to read the data body into req.body (body parser)  
+
+`app.use(express.urlencoded({ extended: false }));` -->
+
+`app.use(express.static(DIRECTORY));` --> required if we are serving static assets
+
+
 
                 -----------------------------------------------------------------------------
 
@@ -1036,6 +1051,47 @@ what to do:-
 
                 -----------------------------------------------------------------------------
 
+
+* ### 8 -  **Proxying HTTP Requests**
+    - #### *8.1 - Single-Route, Multi-Origin Proxy* --> clients to single server??
+    - #### *8.2 - Single-Origin, Multi-Route Proxy* --> single client to multiple servers??
+
+Route based proxity??? (fastify-htp-proxy)
+
+
+
+Proxity definition = the authority to act on the behalf of someone else.
+
+A proxy is an intermediate application which sits between two (or more) services and process / modifies the requests and responses in both directions.
+
+The way to approach it, by looking at the `Direction of data exchange`. Who is the client and who is the server.
+
+Forward Proxy (are for clients )
+A Forward proxy is a server that hides the identity of a client(s), ie the server doesn't know who the client is.
+Client(s) -------> Forward Proxy -------> Server
+
+
+A Reverse Proxy (are for servers )
+A reverse proxy is a service that hides the Service from the client(s)
+Client <------- Reverse Proxy <------- Server(s)
+
+Advantages of a reverse proxy:
+- Security 
+  - DDOS attack prevention
+  - Firewall
+  - Block bots and hackers
+- Caching
+- Load balancing
+
+A route determines the path of the request
+
+two types of proxies
+
+
+                -----------------------------------------------------------------------------
+
+
+
 ### 9 -  **Web Security: Handling User Input**
 
 for any public facing service we must consider that a user could be malicious. Therefore it is of paramount importance that any external inputs into our service are sanitized in ways to protect our backend code.
@@ -1070,12 +1126,51 @@ Key takeouts:-
 2. Express (Node querystring module doesn't) supports square-bracket query-string denotation
 3. We need to be aware that the query string can be a string or an array, and as such call appropriate functions.
 
+So we need to be able to handle this is the backend, we won't be expecting an array, and thus we might be using methods that don't work with arrays and thus could crash our app.
+
+Fortunately there is a npm package, called http parameter pollution, which clears up the query string.
+
+```
+$npm i hpp
+```
 
 
+```js
+// app.js file
 
-So backend validation with Express
+const hpp = require('hpp');
+
+// put before our route middleware
+// prevents parameter pollution
+
+app.use(hpp());
+
+```
+
+However we might have some scenarios where we may want duplicate parameters, ie lets say we have a tour website, and we want customers to be able to search for tours with a duration of 9 & 5 days.
+
+Given the URL:`http://example.com/.tours?duration=5&duration=9` the query string --> `{ duration: [ "5", "9" ] }`
+
+so we want to allow this, ie not block it with the `hpp` package, fortunately we can include `whitelist` ie a list of things we consider to be acceptable. the whitelist is simply an array of properties for which we allow duplication.
 
 
+```js
+// app.js file
+
+const hpp = require('hpp');
+
+// put before our route middleware
+// prevents parameter pollution
+
+app.use(
+  hpp({
+    whitelist: [
+      'duration`
+    ]
+  })
+);
+
+```
 
 
 
@@ -1116,6 +1211,40 @@ app.use(function (req, res, next) {
 
 So if **req.socket.remoteAddress** matches our target IP address then we generate a new Error and set its error code to 403 (Forbidden) then call **next(err)** which means we pass of our generated error to our catch all error handler and we exit (return out) of this middleware function. if the IP address does not match our target then we just go to the next piece of middleware.
 
+
+#### Rate limiting with Express
+
+We may want to apply a rate limit to all incoming requests from all IP addresses, this is easy enough to do, with the following express package.
+
+`$npm i express-rate-limit`  
+
+We set the maximum requests (ie 100) and the duration (ie 100 over x milliseconds), in this case 1 hour. 
+60mins x 60 seconds x 1000 milliseconds.  
+
+```js
+// app.js file
+
+const rateLimit = require('express-rate-limit');
+
+// put at the top of our middleware
+// ie we want it to apply to all incoming requests
+
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!'
+})
+
+app.use('/api', limiter);
+
+
+```
+
+
+
+
+---
 
 ### Catch all error handler middleware
 
