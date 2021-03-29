@@ -54,6 +54,27 @@ Non-GET methods
 
 ### B) Express TLTR:-
 
+Whenever the Express application receives an HTTP request it provides the developer with a `res` (response) object, which is an enhanced version of the Node response object.
+
+Express gives us many ways to send responses:-
+
+1. `res.send( [body] )` 
+  - Body can be any of:- Buffer, String, Object, Array 
+  - Based on the body type we use, Express will automatically set the appropriate `Content-Type`
+
+
+2. `res.json()`
+    Why do we need this when we can just use res.send to return json????
+     - the reason as you might have guessed is that res.json gives us access to some specific methods around formatting, if we don't need them then just use res.send(). In Express under the hood when we are sending back JSON either with `res.json()` or `res.send({ object })` express uses the native `JSON.stringify()` method to serialize the given value which has the optional parameters of `replacer & space`.  
+     - `JSON.stringify(object, replacer, space)`.  
+
+3. `res.end()`
+    This is automatically built into res.send() amd res.json(). But we might have then scenario where we don't want to send either of those two, we just want to end things now, then we would use it as follows:-
+
+    `res.status(404).end()` 
+
+
+
 The key express package is the global express-generator which we can use to scaffold out an express server for us.
 
 `$sudo install -g express-generator@4`.
@@ -665,7 +686,7 @@ app.listen(PORT, console.log(`Listening on port ${PORT}.....`));
 
 Results:-
 
-`GET/ http://localhost:3000` ---> <h1>Hello</h1> (html output) - status of: 200 OK
+`GET/ http://localhost:3000` ---> \<h1>Hello\</h1> (html output) - status of: 200 OK
 `GET/ http://localhost:3000/blarg` --->  Not Found (html output) - status of: 404 Not Found
 `POST/ http://localhost:3000` ---> Method Not Allowed (html output) - status of: 405 Method Not Allowed
 
