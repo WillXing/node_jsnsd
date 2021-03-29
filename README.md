@@ -2,12 +2,12 @@
 * ### 3 -  **Creating a Web Server**
     -  #### *return data from a Library API / set status codes*
 * ### 4 -  **Serving Web Content**
-      - ##### *4.0.1 - uses templates*
-    - ##### *4.0.2 - servers static content using templates
-    - ##### *4.1 - render a view
-    - ##### *4.2 - stream content
+    - ##### *4.0.1 - uses templates*
+    - ##### *4.0.2 - servers static content using templates*
+    - ##### *4.1 - render a view*
+    - ##### *4.2 - stream content*
 * ### 5 -  **Creating RESTful JSON Services**
-    - ##### *5.0 - return JSON for a GET
+    - ##### *5.0 - return JSON for a GET*
 * ### 6 -  **Manipulating Data with RESTful Services**
    - #### *6.1 - Implementing POST,PUT and DELETE **
 * ### 7 -  **Consuming and Aggregating Services**
@@ -54,6 +54,9 @@ Non-GET methods
 
 ### B) Express TLTR:-
 
+
+### Express response
+
 Whenever the Express application receives an HTTP request it provides the developer with a `res` (response) object, which is an enhanced version of the Node response object.
 
 Express gives us many ways to send responses:-
@@ -73,7 +76,7 @@ Express gives us many ways to send responses:-
 
     `res.status(404).end()` 
 
-
+### Express Scaffolding with the Global Express Package
 
 The key express package is the global express-generator which we can use to scaffold out an express server for us.
 
@@ -701,8 +704,7 @@ Fastify the alternative to Express is more around serving RESTful JSON services,
 
 #### serving static content using template engine
 
-Create a web server that will use any templating engine of choice to render 
-
+Create a web server that will use any templating engine of choice to render content, the key is we need to tell Express what engine we are using and where to find the folder that contains the templates(views) etc to be rendered.
 
 
 1. - create folder & go into it
@@ -730,13 +732,13 @@ Aside ejs
 `<% just says ignore I'm doing some JS stuff>`
 
 example:-
-<h1>Your random number is : <%= num %></h1>
+\<h1>Your random number is : <%= num %></h1>
 <% if(num % 2 === 0) { %>
-<h2>That is an even number!</h2>
+\<h2>That is an even number!</h2>
 <% } else { %>
-<h2>That is an odd number!</h2>
+\<h2>That is an odd number!</h2>
 <% } %>
-<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>
+\<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>
 
 
 
