@@ -164,10 +164,12 @@ app.get('/api/tours/:location/:route/:group?', (req, res) => {
 `var logger = require('morgan');`
 `app.use(logger('dev'));`   --> needed if we want to log reqs to the command line  
 
+parsing middleware, we can use one or more of them
 `app.use(express.json());`  
 ---> required if using put/patch/post methods, the we need this to read the data body into req.body (body parser)  
 
-`app.use(express.urlencoded({ extended: false }));` -->
+`app.use(express.urlencoded({ extended: true }));` 
+--> required for parsing application/x-www-form-urlencoded (ie data from a form)
 
 `app.use(express.static(DIRECTORY));` --> required if we are serving static assets
 
@@ -192,6 +194,23 @@ The Express req.query object would look like:-
 ```js
 { q: 'dogs', color: 'red', cars: 'ford'}
 ```
+
+                -----------------------------------------------------------------------------
+
+
+### Req.body
+
+The body (ie from POST/PATCH/PUT) can come in to us in many different forms, thus we have to tell express what we are expecting.
+
+As above we use:-
+
+parsing middleware, we can use one or more of them
+`app.use(express.json());`  
+---> required if using put/patch/post methods, the we need this to read the data body into req.body (body parser)  
+
+`app.use(express.urlencoded({ extended: true }));` 
+--> required for parsing application/x-www-form-urlencoded (ie data from a form)
+
 
 ---
 
@@ -979,12 +998,8 @@ Basically we are returning what stream.js gives us, the key is that data.js know
 ---
 
 
-
-
-
-
 ### 5 -  **Creating RESTful JSON Services**
-GET
+All we are talking about here is returning JSON, the way to look at RESTful JSON is its used when we are building a an API server and for that we need to return JSON.
 
 
 ### 5.1 Task:- Implement a RESTful JSON GET
@@ -1000,7 +1015,7 @@ A. Create a webserver that:-
 
    The following cases must be successfully handled:
    * - A successful request should respond with a 200 status code, Express will do this automatically. 
-   * - The response should have the correct mime type header. In this case we need to make sure the **Content-Type** header is set to **application/json**.
+   * - The response should have the correct mime type header. In this case we need to make sure the **Content-Type** header is set to **application/json** (Express will do this automatically).
    * - A GET request to a route that does not exist should respond with a **404** status code. The Express configuration handles this by default.
    * - If a given boat ID isn't found in the model the server should respond with a **404** status code. The response body can contain anything, but it's important that the response status is set to 404.
    * - Unexpected errors in the model should cause the server to respond with a **500** status code. This means that if the **read** method of the model passed an Error object to the callback that was unexpected or unrecognised, that error needs to be propagated to the framework we're using in some way so that the framework can automatically generate a 500 response.
@@ -1029,6 +1044,8 @@ files:-
 ```
 
 ```js
+// models.js
+
 'use strict'
 
   module.exports = {
@@ -1124,9 +1141,57 @@ create a project, ie **express my-express-service**
       3. add in logic to retrieve data from models
       4. add in error handling
 
+
+The route/boat.js file created:-
+
+```js
+// routes/boat.js
+
+var express = require('express');
+var router = express.Router();
+var model = require('../model');
+
+/* GET users listing. */
+router.get('/:id', function(req, res, next) {
+  model.boat.read(req.params.id, (err, result) => {
+    if (err) {
+      if (err.message === 'not found') next();
+      else next(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+module.exports = router;
+
+```
+
+
+
+
+
+
+
 key learning:
 a - use express project generator
 b - rename files with mv
+
+
+Ran the validate file it passed the following:-
+
+```
+$node validate.js
+
+GET http://localhost:pidNumber/boat/1 responded with 200 response
+GET http://localhost:pidNumber/boat/1 responded with correct Content-Type header
+GET http://localhost:pidNumber/boat/1 responded with correct data
+GET http://localhost:pidNumber/unsupported/route responded with 404 response
+GET http://localhost:pidNumber/boat/999 responded with 404 response
+POST http://localhost:pidNumber/boat/999 responded with 400, 404 or 405 response
+GET http://localhost:pidNumber/boat/c982 responded with 500 response
+
+```
 
 ---
 
@@ -1161,8 +1226,6 @@ Previously we handled GET requests, now need to handle POST,PUT & DELETE ones.
 
 ### 6.1 Task:- Implement a RESTful JSON POST
 
-
-
 A. Create a webserver that:-
 
 1. We have two files, model.js & package.json (detailed below)
@@ -1170,7 +1233,7 @@ A. Create a webserver that:-
 
 The server should support a **POST** request to **/boat** that uses the **model.js** file to create a new entry. The route should only accept **application/json** mine-type requests and should respond with **application/json** content-type responses.
 
-Th **POST** request should expect JSON data to be sent in the following format:
+The **POST** request should expect JSON data to be sent in the following format:
 
 **{ data: { brand, color } }**
 
@@ -1197,16 +1260,70 @@ what to do:-
 
 
 
+Ran the validate file it passed the following:-
+
+```
+$node validate.js
+
+GET http://localhost:pidNumber/boat/1 responded with 200 response
+GET http://localhost:pidNumber/boat/1 responded with correct Content-Type header
+GET http://localhost:pidNumber/boat/1 responded with correct data
+
+GET http://localhost:pidNumber/boat responded with A 201 response
+GET http://localhost:pidNumber/boat responded with correct Content-Type header
+GET http://localhost:pidNumber/boat responded with correct data
+
+GET http://localhost:pidNumber/boat/3 responded with 200 response
+GET http://localhost:pidNumber/boat/3 responded with correct Content-Type header
+GET http://localhost:pidNumber/boat/3 responded with correct data
+
+POST http://localhost:pidNumber/boat with poison data responded with 500 response
+
+```
+
+
+
+
+### 6.2 Task:- Implement a RESTful JSON DELETE
+
+A. Create a webserver that:-
+
+to dox
+xxxx
+x
+x
+x
+xx
+x
+x
+
+
+
+
+
+
+
+
+
+                -----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
                 -----------------------------------------------------------------------------
 
 
 * ### 8 -  **Proxying HTTP Requests**
     - #### *8.1 - Single-Route, Multi-Origin Proxy* --> clients to single server??
     - #### *8.2 - Single-Origin, Multi-Route Proxy* --> single client to multiple servers??
-
-Route based proxity??? (fastify-htp-proxy)
-
-
 
 Proxity definition = the authority to act on the behalf of someone else.
 
@@ -1236,9 +1353,14 @@ A route determines the path of the request
 two types of proxies
 
 
+
+
+
+
+
+
+
                 -----------------------------------------------------------------------------
-
-
 
 ### 9 -  **Web Security: Handling User Input**
 
@@ -1321,9 +1443,301 @@ app.use(
 
 ```
 
-#### Route validation ie checking the body of something !!!!!!
+#### 9.1 Parameter Pollution Safe
+
+1. We have three files, app.js, validate.js & package.json (detailed below)
+
+The **package.json** file contains the following:
+
+```json
+// package.json
+
+{
+  "name": "labs-1",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
+```
+
+The **app.js** file contains the following:-
+
+```js
+// app.js
+
+'use strict'
+const express = require('express')
+const app = express()
+const router = express.Router()
+const { PORT = 3000 } = process.env
+
+router.get('/', (req, res) => {
+  setTimeout(() => {
+    res.send((req.query.un || '').toUpperCase())
+  }, 1000)
+})
+
+app.use(router)
+
+app.listen(PORT, () => {
+  console.log(`Express server listening on ${PORT}`)
+})
+
+```
+
+This is a small Express service that uppercases any input sent via a **un** query string parameter, but it waits one second before sending the response.
+
+This service is vulnerable to parameter pollution. A URL such as **http://localhost:3000/?un=a&un=b** will cause the service to crash, assuming the service is listening on port 3000.
+
+Fix it, without changing any of the current functionality.
+
+The parameter pollution attack may be handled as seen fit. For instance upper casing all forms, or sending a 400 Bad Request, or any kind of response. The only thing that must not happen is the service crashing and requests containing query-strings with a single **un** parameter must continue to respond with the uppercased version of that value.
 
 
+Thoughts:-
+Easiest thing to do is bring in the npm hpp package and just set it up as middleware, no whitelist required.
+
+1. $npm i hpp
+2. in app.js file, require it:- `const hpp = require('hpp');`
+3. and set it up as middleware:-  `app.use(hpp());`
+
+
+```js
+// app.js 
+
+'use strict'
+const express = require('express')
+const app = express()
+const router = express.Router()
+const { PORT = 3000 } = process.env
+const hpp = require('hpp');
+
+app.use(hpp());
+
+router.get('/', (req, res) => {
+  setTimeout(() => {
+    res.send((req.query.un || '').toUpperCase())
+  }, 1000)
+})
+
+app.use(router)
+
+app.listen(PORT, () => {
+  console.log(`Express server listening on ${PORT}`)
+})
+
+```
+
+Ran the validate file it passed the following:-
+
+```
+$node validate.js
+
+GET http://localhost:3001/?un=xxfff224 responded with 200 response
+GET http://localhost:3001/?un=xxfff224 responded after approx. 1s
+GET http://localhost:3001/?un=xxfff224 responded with correct data
+GET http://localhost:3001/?un=xx9e547e&un=xx7bc6ef responded without the service crashing
+GET http://localhost:3001 responded without the service crashing
+```
+
+
+#### 9.2 Validate a POST (ie the body shape)
+
+We are using the boat model from previous task.
+
+
+Apply a validation to the POST route request body so that any POST request bodies that do not have the shape **{ data: { brand, color }}** are rejected with a 400 Bad Request status code. Additional properties are allowed, but should be stripped before being stored.
+
+Do not remove or otherwise modify any of the routes.
+
+We are basically validating the body and its contents of what is sent through.
+
+
+Thoughts:-
+
+1. We need to create a couple of validator functions
+2. one to check that the objects properties are 'brand' & 'color' and that they are strings.
+3. one to check that the object does indeed contain a property called data which is an object.
+4. probably also create an error function.
+
+All the above are to go into the route/boat.js file.
+
+```js
+// boat.js
+
+var express = require('express');
+var router = express.Router();
+var model = require('../model');
+
+
+function hasOwnProperty (o, p) {
+  return Object.prototype.hasOwnProperty.call(o, p);
+}
+
+function validateData (o) {
+  var valid = o !== null && typeof o === 'object';
+  valid = valid && hasOwnProperty(o, 'brand');
+  valid = valid && hasOwnProperty(o, 'color');
+  valid = valid && typeof o.brand === 'string';
+  valid = valid && typeof o.color === 'string';
+  return valid && {
+    brand: o.brand,
+    color: o.color
+  };
+}
+
+function validateBody (o) {
+  var valid = 0 !== null && typeof o === 'object';
+  valid = valid && hasOwnProperty(o, 'data');
+  valid = valid && o.data !== null && typeof o.data === 'object';
+  var data = valid && validateData(o.data);
+  return valid && data && {
+    data: data
+  };
+}
+
+function badRequest() {
+  const err = new Error('Bad Request');
+  err.status = 400;
+  return err;
+}
+
+
+/* GET boat listing. */
+router.get('/:id', function(req, res, next) {
+  model.boat.read(req.params.id, (err, result) => {
+    if (err) {
+      if (err.message === 'not found') next();
+      else next(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+
+router.post('/', function(req, res, next) {
+  var id = model.boat.uid();
+  var body = validateBody(req.body);
+  if (body) {
+    model.boat.create(id, body.data, (err) => {
+      if (err) next(err);
+      else res.status(201).send({id});
+    });
+  } else {
+    next(badRequest());
+  }
+});
+ 
+router.post('/:id/update', function(req, res, next) {
+  var body = validateBody(req.body);
+  if (body) {
+    model.boat.update(req.params.id, body.data, (err) => {
+      if (err) {
+        if(err.message === 'not found') next();
+        else next (err);
+      } else {
+        res.status(204).send();
+      }
+    });
+  } else {
+    next(badRequest());
+  }
+});
+
+
+router.put('/:id', function (req, res, next) {
+  var body = validateBody(body);
+  if(body) {
+    model.boat.create(req.params.id, body.data, (err) => {
+      if (err) {
+        if(err.message === 'resource exists') {
+          model.boat.update(req.params.id, body.data, (err) => {
+            if (err) next (err);
+            else res.status(204).send();
+          });
+        } else {
+          next(err);
+        } 
+      } else {
+        res.status(201).send({});
+      }
+    });
+  } else {
+    next(badRequest());
+  }
+});
+
+router.delete('/:id', function(req, res, next) {
+  model.boat.del(req.params.id, (err) => {
+    if(err) {
+      if(err.message === 'not found') next();
+      else next(err);
+    } else {
+      res.status(204).send();
+    }
+  });
+});
+
+
+module.exports = router;
+```
+
+The above works, but think we need an explanation around the created functions
+
+```js
+function validateData (o) {
+  var valid = o !== null && typeof o === 'object';
+  valid = valid && hasOwnProperty(o, 'brand');
+  valid = valid && hasOwnProperty(o, 'color');
+  valid = valid && typeof o.brand === 'string';
+  valid = valid && typeof o.color === 'string';
+  return valid && {
+    brand: o.brand,
+    color: o.color
+  };
+}
+```
+
+Note:
+
+`&&` The logical AND returns true, only if all its operands are true.
+
+`valid = true or false`, ie 
+**valid = true** : if what is passed in, is not null AND is an object
+**valid = false** : if what is passed in, is null AND OR is not an object
+
+`valid = valid && hasOwnProperty(o, 'brand');`, all we doing is if true and further conditions are true then its carried down, else false is carried down.
+
+The final bit of the puzzle is the return statement which will return an object with brand & color providing valid = true, if it = false then false is returned.
+
+```js
+return valid && {
+    brand: o.brand,
+    color: o.color
+  };
+
+```
+
+
+SO THE validateBody is slightly different in that we validate that the object contains a property called data and the value of data is an object.
+
+```js
+function validateBody (o) {
+  var valid = 0 !== null && typeof o === 'object';
+  valid = valid && hasOwnProperty(o, 'data');
+  valid = valid && o.data !== null && typeof o.data === 'object';
+  var data = valid && validateData(o.data);
+  return valid && data && {
+    data: data
+  };
+}
+```
 
                 -----------------------------------------------------------------------------
 
@@ -1348,6 +1762,8 @@ Express passes the **req** and **res** objects to each piece of registered middl
 Lets say we wanted to block the IP 127.0.0.1 (this is local host) in a Express application, we would include the following middleware before any other middleware.
 
 ```js
+// app.js file
+
 app.use(function (req, res, next) {
   if (req.socket.remoteAddress === '127.0.0.1') {
     const err = new Error ('Forbidden');
@@ -1391,18 +1807,33 @@ app.use('/api', limiter);
 
 ```
 
+### 10.1 Task:- Block IP Address with Express
+
+A. Using the files in the folder:-
+
+1. Imagine this is a deployed service, which is receiving a DoS attack from the IP address 111.345.55.211
+2. Edit the service so that this IP address, and only this IP address, receives a 403 Forbidden response from the service.
 
 
-
----
-
-### Catch all error handler middleware
-
-When we generate an Express app using the express generator then it automatically includes the error handler below.
-Note:- we know its an error handler as its first parameter is err, also it will be positioned after all the other middleware, so it can catch any errors.
+Thoughts:-
+All we need to do is in app.js file, before any of our route handling is to put a bit of middleware that checks the IP address:-
 
 ```js
+app.use(function (req, res, next) {
+  if (req.socket.remoteAddress === '111.34.55.211') {
+    const err = new Error ('Forbidden');
+    err.status = 403;
+    next(err);
+    return;
+  }
+  next();
+});
 
+```
+
+By doing this we block the IP address, create and error and hand the error off to the error handler.
+
+```js
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -1415,12 +1846,28 @@ app.use(function(err, req, res, next) {
 });
 ```
 
+Ran the validate file it passed the following:-
+
+```
+$node validate.js
+
+GET http://localhost:3001/ responded with 200 response
+GET http://localhost:3001/ responded with 403 when requested from attacker IP
+
+```
+
+---
+
 
 
 
 
 
                 -----------------------------------------------------------------------------
+
+
+
+
 
 
 ### 0 - Handling errors
