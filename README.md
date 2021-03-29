@@ -731,14 +731,14 @@ Aside ejs
 `<%= evaluates js and returns a result %>`
 `<% just says ignore I'm doing some JS stuff>`
 
-example:-
-\<h1>Your random number is : <%= num %></h1>
-<% if(num % 2 === 0) { %>
-\<h2>That is an even number!</h2>
-<% } else { %>
-\<h2>That is an odd number!</h2>
-<% } %>
-\<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>
+example:-  
+\<h1>Your random number is : <%= num %></h1>  
+<% if(num % 2 === 0) { %>  
+\<h2>That is an even number!</h2>  
+<% } else { %>  
+\<h2>That is an odd number!</h2>  
+<% } %>  
+\<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>  
 
 
 
