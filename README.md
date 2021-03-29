@@ -82,6 +82,14 @@ The key express package is the global express-generator which we can use to scaf
 
 `$sudo install -g express-generator@4`.
 
+**How to use it**
+If we wanted to create a project called `my-project` we would do:-  
+
+`$express my-project`  
+
+If we wanted to automatically set the view engine to handlebars then we would do:-  
+`$express --hbs my-project`  
+
 
 If we use the Express generator and it asks us to only allow static hosting in development and production static hosting is left as a deployment infrastructure problem then in app,js file we need to change static to:-
 
@@ -727,19 +735,20 @@ Create a web server that will use any templating engine of choice to render cont
 17. - tell express about the public folder and set an absolute path to it
 
 
-Aside ejs
-`<%= evaluates js and returns a result %>`
-`<% just says ignore I'm doing some JS stuff>`
+**Aside ejs**  
+`<%= evaluates js and returns a result %>`  
+`<% just says ignore I'm doing some JS stuff>`  
 
-example:-  
-\<h1>Your random number is : <%= num %></h1>  
+**Example:-**  
+```html
+<h1>Your random number is : <%= num %></h1>  
 <% if(num % 2 === 0) { %>  
-\<h2>That is an even number!</h2>  
+<h2>That is an even number!</h2>  
 <% } else { %>  
-\<h2>That is an odd number!</h2>  
+<h2>That is an odd number!</h2>  
 <% } %>  
-\<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>  
-
+<h3>The number is: <%= num % 2 === 0 ? 'EVEN' : 'ODD' %></h3>  
+```
 
 
 ### Streaming data
@@ -837,10 +846,66 @@ app.listen(PORT, () => console.log(`stream listening on port ${PORT}...`));
 
 ### 4.1 Task:- Render a view
 
+Using Express create a project with a **/me** route. Render a view that uses the **layout.hbs** as per below. The HTML content is unimportant, just make sure to render a view.  
 
 
+```html
+<!-- // views/layout.hbs -->
+<html>
+  <head>
+    <style>
+      body { background: #333; margin: 1.25rem }
+      h1 { color: #EEE; font-family: sans-serif }
+      a { color: yellow; font-size: 2rem; font-family: sans-serif }
+    </style>
+  </head>
+  <body>
+    {{{ body }}}
+  </body>
+</html>
+
+```
+
+Thoughts:-
+Seems pretty straight forward, going to use the global express generator.  
 
 
+the todo:-
+
+1. - in the main folder do `$express --hbs 4.1render-a-view`
+2. - alter the generated layout.hbs file to be as above
+3. - changed `/users` to `/me` in app.js and in routes directories
+4. - install node packages `$npm install`
+5. - as good practice change the `public` folder to be served up in development. 
+
+```js
+// app.js 
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// to:-
+if (process.env.NODE_ENV !== 'production' ){
+  app.use(express.static(path.join(__dirname, 'public')));
+}
+```
+
+6. - slightly alter the contents of the routes/me.js file (was routes/users.js file) to render the layout view with some html, the key thing is to `render the layout view`.
+
+
+```js
+// me.js
+
+var express = require('express');
+var router = express.Router();
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  //res.send('respond with a resource'); --took out replaced with below
+  res.render('layout', { body: `<h1>Hello</h1>` });
+});
+
+module.exports = router;
+```
 
                 -----------------------------------------------------------------------------
 
@@ -872,12 +937,44 @@ function stream () {
 module.exports = stream
 ```
 
+
+Thoughts:-
+Seems pretty straight forward, we just need to build the data.js file and ensure we use stream() and that we only finish, ie call res.end() when complete. Did without using the express generator, and used ejs.
+
+
 Create a new route path `/data` and send data from this stream function as a response when the `/data` route is requested.
 
-1. - In routes directory create data.js file
-2. - Set up data.js and require in the data.js file 
-3. - In app.js bring in data route.
+1. - In app.js set up the dataRoutes
+2. - In routes directory create data.js file 
+3. - populated the data.js file as follows:-
 
+```js
+// data.js
+
+'use strict'
+const express = require('express');
+const router = express.Router();
+const finished = require('stream').finished;
+const stream = require('../stream');
+
+
+router.get('/', function(req, res, next) {
+  const finalStream = stream();
+  finalStream.pipe(res, { end: false })
+
+  finished(finalStream, (err) => {
+    if(err) {
+      next(err)
+      return
+    }
+    res.end()
+  })
+});
+
+module.exports = router;
+```
+
+Basically we are returning what stream.js gives us, the key is that data.js knows its a stream of data that it will receive and thus sets things up accordingly, ie we get a delay between items in the response stream and then and only closes at the end.
 
 ---
 
